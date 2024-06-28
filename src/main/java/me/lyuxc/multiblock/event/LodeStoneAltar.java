@@ -24,7 +24,7 @@ import java.util.Map;
 import static me.lyuxc.multiblock.utils.Utils.getBlock;
 
 @EventBusSubscriber
-public class EnchantingTableToEntity {
+public class LodeStoneAltar {
     private static final String[] matrix = {
             "XXXXXXOXXXXXX",
             "XGMXXXONNNXXX",
