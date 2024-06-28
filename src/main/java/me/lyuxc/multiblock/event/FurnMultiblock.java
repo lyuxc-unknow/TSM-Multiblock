@@ -9,6 +9,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
+import static me.lyuxc.multiblock.utils.Utils.getBlock;
+
 @EventBusSubscriber
 public class FurnMultiblock {
     @SubscribeEvent
@@ -16,24 +18,14 @@ public class FurnMultiblock {
         Level level = event.getLevel();
         BlockPos pos = event.getPos();
         Block block = getBlock(level,pos);
-        int x = event.getPos().getX();
-        int y = event.getPos().getY();
-        int z = event.getPos().getZ();
         if(block instanceof FurnaceBlock) {
-            if(!isValid(level,x,y,z) || level.isRaining()) {
+            if(!isValid(level,pos) || level.isRaining()) {
                 event.setCanceled(true);
             }
         }
     }
 
-    public static Block getBlock(Level level, BlockPos pos) {
-        return level.getBlockState(pos).getBlock();
-    }
-
-    private static Boolean isValid(Level level, int x, int y, int z) {
-        return getBlock(level,new BlockPos(x + 1,y,z)) == Blocks.COAL_BLOCK &&
-                getBlock(level,new BlockPos(x - 1,y,z)) == Blocks.COAL_BLOCK &&
-                getBlock(level,new BlockPos(x,y,z + 1)) == Blocks.COAL_BLOCK &&
-                getBlock(level,new BlockPos(x,y,z - 1)) == Blocks.COAL_BLOCK;
+    private static Boolean isValid(Level level,BlockPos pos) {
+        return getBlock(level,pos.offset(0,2,0)) == Blocks.WATER_CAULDRON;
     }
 }

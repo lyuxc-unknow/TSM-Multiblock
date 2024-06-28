@@ -155,7 +155,12 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            url "http://localhost:8080/repository/maven-releases/"
+            allowInsecureProtocol = true
+            credentials {
+                username = 'admin'
+                password = '@lyuxc@'
+            }
         }
     }
 }
