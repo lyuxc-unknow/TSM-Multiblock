@@ -2,10 +2,8 @@ package me.lyuxc.multiblock.event;
 
 import me.lyuxc.multiblock.utils.Utils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,27 +58,28 @@ public class LodeStoneAltar {
     }
 
     @SubscribeEvent
-    public static void onRightEnchantingTable(PlayerInteractEvent.RightClickBlock event) {
+    public static void onPlayerRightLodeStone(UseItemOnBlockEvent event) {
         Level level = event.getLevel();
         BlockPos pos = event.getPos();
         Player player = event.getEntity();
         ItemStack itemStack = player.getItemBySlot(EquipmentSlot.MAINHAND);
-        if(level instanceof ServerLevel) {
-            if(getBlock(level,pos) == Blocks.LODESTONE) {
-                if(isValid(level,pos) && itemStack.is(Items.ENCHANTED_BOOK)) {
-                    Creeper creeper = new Creeper(EntityType.CREEPER,level);
-                    spawnEntity(level,creeper,pos);
-                    event.setCanceled(true);
+        if(!level.isClientSide()) {
+            if(event.getUsePhase() == UseItemOnBlockEvent.UsePhase.ITEM_AFTER_BLOCK) {
+                if(getBlock(level,pos) == Blocks.LODESTONE) {
+                    if(isValid(level,pos) && itemStack.is(Items.ENCHANTED_BOOK)) {
+                        spawnEntity(level,pos);
+                    }
                 }
             }
         }
     }
 
-    private static void spawnEntity(Level level, LivingEntity entity, BlockPos pos) {
-        entity.moveTo(pos.getX(),pos.getY(),pos.getZ());
-        entity.getAttributes().getInstance(Attributes.MAX_HEALTH).setBaseValue(40);
-        entity.setHealth(entity.getMaxHealth());
-        level.addFreshEntity(entity);
+    private static void spawnEntity(Level level, BlockPos pos) {
+        Creeper creeper = new Creeper(EntityType.CREEPER,level);
+        creeper.moveTo(pos.getX(),pos.getY(),pos.getZ());
+        creeper.getAttributes().getInstance(Attributes.MAX_HEALTH).setBaseValue(40);
+        creeper.setHealth(creeper.getMaxHealth());
+        level.addFreshEntity(creeper);
     }
 
     private static boolean isValid(Level level,BlockPos pos) {

@@ -34,8 +34,9 @@ public class Utils {
         boolean valid = false;
         for(int i = 0;i<size;i++) {
             for(int j = 0;j<size;j++) {
-                if(matrix[i].charAt(j) == 'X') continue;
-                valid = checkBlock(matrix[i].charAt(j),level,pos,blockMap,i,yAxis,j,offset);
+                char key = matrix[i].charAt(j);
+                if(key == 'X') continue;
+                valid = checkBlock(key,level,pos,blockMap,i,yAxis,j,offset);
                 if(!valid) break;
             }
             if(!valid) break;
