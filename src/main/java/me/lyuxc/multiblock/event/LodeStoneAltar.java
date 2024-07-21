@@ -4,8 +4,7 @@ import me.lyuxc.multiblock.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -58,16 +57,17 @@ public class LodeStoneAltar {
     }
 
     @SubscribeEvent
-    public static void onPlayerRightLodeStone(UseItemOnBlockEvent event) {
+    public static void onPlayerRightClickLodeStone(UseItemOnBlockEvent event) {
         Level level = event.getLevel();
         BlockPos pos = event.getPos();
         Player player = event.getEntity();
         ItemStack itemStack = player.getItemBySlot(EquipmentSlot.MAINHAND);
         if(!level.isClientSide()) {
             if(event.getUsePhase() == UseItemOnBlockEvent.UsePhase.ITEM_AFTER_BLOCK) {
-                if(getBlock(level,pos) == Blocks.LODESTONE) {
-                    if(isValid(level,pos) && itemStack.is(Items.ENCHANTED_BOOK)) {
+                if(getBlock(level,pos) == Blocks.LODESTONE && getBlock(level,pos.offset(0,1,0)) == Blocks.LIGHTNING_ROD) {
+                    if(isValid(level,pos) && itemStack.is(Items.GUNPOWDER)) {
                         spawnEntity(level,pos);
+                        itemStack.setCount(itemStack.getCount() - 1);
                     }
                 }
             }
@@ -75,11 +75,9 @@ public class LodeStoneAltar {
     }
 
     private static void spawnEntity(Level level, BlockPos pos) {
-        Creeper creeper = new Creeper(EntityType.CREEPER,level);
-        creeper.moveTo(pos.getX(),pos.getY(),pos.getZ());
-        creeper.getAttributes().getInstance(Attributes.MAX_HEALTH).setBaseValue(40);
-        creeper.setHealth(creeper.getMaxHealth());
-        level.addFreshEntity(creeper);
+        LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT,level);
+        lightningBolt.moveTo(pos.offset(0,1,0),0,0);
+        level.addFreshEntity(lightningBolt);
     }
 
     private static boolean isValid(Level level,BlockPos pos) {
